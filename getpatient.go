@@ -25,30 +25,27 @@ func GetDoc(dB *sql.DB) gin.HandlerFunc {
 		if errC == sql.ErrNoRows {
 			utils.RespondWithError(http.StatusBadRequest, "Sorry Patient not found", c)
 			return
-		}
-    
-     if user.Email != "" {
-			err = dB.QueryRow("SELECT password FROM user WHERE email=?", user.Email).Scan(&password)
-			if err != nil {
-				utils.RespondWithError(http.StatusInternalServerError, "unable to let you in", c)
-				return
+		} else {
+			for rows.Next() {
+			         err := rows.Scan(&patient.Name, &patient.Age, &patient.Gender)
+					if err != nil {
+						utils.RespondWithError(http.StatusInternalServerError, err.Error(), c)
+						return
+					}
+					patients = append(patients, patient)
+				}
+				c.JSON(http.StatusOK, gin.H{
+					"success": "true",
+					"message": patients,
+				})
 			}
-			if !(password == user.Password) {
-				utils.RespondWithError(http.StatusBadRequest, "invalid credentials", c)
-				return
-			}
 		}
-		if err != nil {
-			utils.RespondWithError(http.StatusInternalServerError, "unexepected error occurred", c)
-			return
-		}
-    JSON(http.StatusOK, gin.H{
-			"success": "true",
-			"message": "successfully logged in",
-		})
-
-	}
-}
+	    
+	    
+	    
+	    
+	    
+	    
     
-    
+   
     
